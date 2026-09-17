@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para a Linda</title>
+<meta name="description" content="Um pequeno presente para a Linda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="stage-wrap" id="stageWrap">
+
+  <!-- TELA 1 — ENTRADA -->
+  <section class="stage" id="stage-entrada" data-stage="1">
+    <div class="stage-inner stage-inner--center">
+      <p class="fade-item line-heading" style="--d:0">Olá, Linda. <span class="heart">❤️</span></p>
+      <p class="fade-item line-sub" style="--d:1">Tenho uma coisa aqui para ti.</p>
+      <button class="btn btn-primary fade-item" style="--d:2" id="btnEntrar" type="button">Entrar</button>
+    </div>
+  </section>
+
+  <!-- TELA 2 — ÁUDIO -->
+  <section class="stage" id="stage-audio" data-stage="2" hidden>
+    <div class="stage-inner">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">Antes de continuares... ouve isto. <span class="heart">😌</span></p>
+
+      <div class="player fade-item" style="--d:1">
+        <audio id="audioEl" preload="metadata" src="assets/audio/linda-audio.mp3"></audio>
+
+        <button class="player-toggle" id="audioToggle" type="button" aria-label="Reproduzir áudio">
+          <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M8 5.5v13l11-6.5-11-6.5z"></path>
+          </svg>
+          <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false" hidden>
+            <path d="M7 5h4v14H7zM13 5h4v14h-4z"></path>
+          </svg>
+        </button>
+
+        <div class="player-body">
+          <div class="player-bar" id="audioBar" role="slider" aria-label="Progresso do áudio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="player-bar-track"></div>
+            <div class="player-bar-fill" id="audioFill"></div>
+            <div class="player-bar-knob" id="audioKnob"></div>
+          </div>
+          <div class="player-time">
+            <span id="audioCurrent">0:00</span>
+            <span id="audioDuration">&nbsp;</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-link fade-item" style="--d:2" id="btnToVideo" type="button">Agora continua →</button>
+    </div>
+  </section>
+
+  <!-- TELA 3 — VÍDEO -->
+  <section class="stage" id="stage-video" data-stage="3" hidden>
+    <div class="stage-inner">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">Agora é a minha vez de falar contigo. <span class="heart">❤️</span></p>
+      <p class="fade-item line-sub" style="--d:1">Espero que assistas até ao fim.</p>
+
+      <div class="video-frame fade-item" style="--d:2">
+        <video id="videoEl" controls playsinline preload="metadata" src="assets/video/linda-video.mp4"></video>
+      </div>
+
+      <p class="fade-item line-sub line-sub--tight" style="--d:3" id="videoFollowup">Tenho mais uma coisa para te dizer... <span class="heart">❤️</span></p>
+      <button class="btn btn-primary fade-item" style="--d:4" id="btnToCarta" type="button">Continuar</button>
+    </div>
+  </section>
+
+  <!-- TELA 4 — CARTA -->
+  <section class="stage" id="stage-carta" data-stage="4" hidden>
+    <div class="stage-inner">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">Para ti, Linda. <span class="heart">❤️</span></p>
+
+      <article class="letter fade-item" style="--d:1" id="letter">
+        <p>Às vezes penso em como tudo começou e acho engraçado como uma coisa tão simples acabou por me trazer até aqui.</p>
+
+        <p>Foi através da minha prima. Ela publicou uma coisa tua no WhatsApp, deu-me o teu número e, num dia qualquer, decidi mandar-te mensagem.</p>
+
+        <p>Começámos a conversar.</p>
+
+        <p>E, sem eu perceber muito bem quando aconteceu, aquelas primeiras conversas foram-se tornando cada vez mais importantes para mim.</p>
+
+        <p>Em Fevereiro começámos a namorar. E desde então tenho percebido uma coisa: tenho vindo a gostar cada vez mais de ti.</p>
+
+        <p>Gosto de ti não apenas pelos momentos bonitos que temos, mas também por aquelas pequenas coisas que fazem de ti a pessoa que és.</p>
+
+        <p>Por exemplo, aquele teu famoso "fussek" sempre que alguma coisa não te agrada. 😂</p>
+
+        <p>É uma palavra tão tua que, hoje, basta ouvi-la para eu saber exactamente o que significa.</p>
+
+        <p>Gosto também da forma como tratas as pessoas.</p>
+
+        <p>E foi exactamente isso que tentei mostrar no vídeo.</p>
+
+        <p>Tu és muito doce com as pessoas. Tens uma maneira especial de tratar quem está à tua volta, e isso é uma das coisas que mais admiro em ti.</p>
+
+        <p>Tens um "olá" inigualável.</p>
+
+        <p>Um "bom dia" inigualável.</p>
+
+        <p>E tens essa forma tão tua de dizer "obrigado" por praticamente tudo. ❤️</p>
+
+        <p>São coisas pequenas, talvez, mas são precisamente essas pequenas coisas que fazem com que eu reconheça imediatamente que és tu.</p>
+
+        <p>E, claro, não podia esquecer as tuas pequenas "fases". 😂</p>
+
+        <p>Há dias em que, se eu demoro um pouco mais a responder, de repente aparecem mensagens suficientes para eu perceber que, aparentemente, te abandonei para sempre. 😂❤️</p>
+
+        <p>E há aqueles dias em que nunca sei exactamente qual Linda vou encontrar: a mais querida e alegre do mundo ou aquela que decidiu testar um bocadinho a minha paciência. 😂</p>
+
+        <p>Mas até nessas alturas há qualquer coisa que eu gosto em ti.</p>
+
+        <p>Porque são partes de ti, da tua maneira de ser, e fazem parte daquela pessoa que fui conhecendo e de quem tenho vindo a gostar cada vez mais.</p>
+
+        <p>E talvez seja isso que mais gosto: não gosto apenas dos teus momentos perfeitos. Gosto de te conhecer por inteiro.</p>
+
+        <p>Gosto da tua doçura.</p>
+
+        <p>Da tua alegria.</p>
+
+        <p>Da maneira como tratas as pessoas.</p>
+
+        <p>Das tuas manias.</p>
+
+        <p>Do teu "fussek".</p>
+
+        <p>Dos teus "olá" e "bom dia".</p>
+
+        <p>Das mensagens todas quando achas que estou a demorar demasiado para responder. 😂</p>
+
+        <p>E, claro, daquele sorriso...</p>
+
+        <p>O teu sorriso acaba comigo.</p>
+
+        <p>Às vezes nem precisas dizer nada.</p>
+
+        <p>Basta sorrir.</p>
+
+        <p>E pronto. Já era. ❤️</p>
+
+        <p>Hoje, ao completares 18 anos, quero desejar-te muito mais do que apenas um feliz aniversário.</p>
+
+        <p>Quero desejar-te uma vida cheia de momentos que façam esse sorriso aparecer muitas vezes.</p>
+
+        <p>Quero que tenhas coragem para perseguir aquilo que desejas, força para enfrentar os momentos difíceis e pessoas ao teu lado que saibam reconhecer o coração bonito que tens.</p>
+
+        <p>Que nunca percas essa doçura.</p>
+
+        <p>Essa alegria.</p>
+
+        <p>Essa forma tão tua de tratar as pessoas.</p>
+
+        <p>E, por favor, nunca deixes de dizer "obrigado" por tudo. 😂❤️</p>
+
+        <p>Porque são precisamente essas pequenas coisas que fazem de ti a Linda que eu conheço e de quem tenho vindo a gostar cada vez mais.</p>
+
+        <p>Quando olho para trás e penso naquele primeiro dia em que te mandei mensagem, não fazia ideia de que aquela conversa me levaria até aqui.</p>
+
+        <p>Hoje, tenho a oportunidade de celebrar contigo mais um ano da tua vida.</p>
+
+        <p>E fico feliz por poder fazer parte dele.</p>
+
+        <p>Talvez este cartão, este pequeno espaço e tudo o que preparei não consigam dizer tudo aquilo que sinto.</p>
+
+        <p>Mas conseguem dizer uma coisa:</p>
+
+        <p>tu és muito especial para mim.</p>
+
+        <p>E espero que nunca te esqueças disso.</p>
+
+        <div class="letter-close">
+          <p class="letter-close__wish">Feliz 18.º aniversário, Linda. ❤️</p>
+          <p class="letter-close__wish">Que este novo capítulo seja bonito, cheio de conquistas, sorrisos, paz, amor e muitos momentos que valham a pena guardar.</p>
+          <p class="letter-close__wish">E que, quando voltares a olhar para este pequeno presente algum dia, consigas lembrar-te de que, no dia 2 de Outubro de 2026, havia alguém muito feliz por poder celebrar a tua existência.</p>
+          <p class="letter-close__date">2 de Outubro de 2026</p>
+          <p class="letter-close__sign">Com carinho,<br>Lorde ❤️</p>
+        </div>
+      </article>
+
+      <button class="btn btn-link letter-continue" id="btnToFinal" type="button">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- TELA 5 — FINAL -->
+  <section class="stage" id="stage-final" data-stage="5" hidden>
+    <div class="stage-inner stage-inner--center">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">Espero que tenhas gostado. <span class="heart">❤️</span></p>
+      <p class="fade-item line-sub" style="--d:1">Este pequeno espaço foi feito só para ti.</p>
+      <p class="fade-item line-sign" style="--d:2">Com carinho,<br>Lorde <span class="heart">❤️</span></p>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>

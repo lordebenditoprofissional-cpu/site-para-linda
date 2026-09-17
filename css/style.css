@@ -1,0 +1,412 @@
+/* =========================================================
+   Para a Linda — folha de estilos
+   ========================================================= */
+
+:root {
+  /* palette sampled directly from Lorde's physical card:
+     warm cream paper, soft blush background, dusty-rose ribbon,
+     deep wine calligraphy and QR heart */
+  --cream:        #FBF3E7;
+  --paper:        #FFFCF8;
+  --blush:        #F3D8D3;
+  --blush-soft:   #F8E6E1;
+  --dusty-rose:   #CE7D84;
+  --wine:         #741B2A;
+  --wine-deep:    #57121C;
+  --ink:          #3A2422;
+  --ink-soft:     #8C6E6A;
+  --line:         rgba(116, 27, 42, 0.14);
+  --shadow:       rgba(87, 18, 28, 0.12);
+
+  --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --font-ui:      "Jost", "Helvetica Neue", Arial, sans-serif;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+body::before {
+  /* very quiet radial warmth, not a pattern */
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(60% 45% at 50% 0%, var(--blush-soft) 0%, transparent 70%),
+    radial-gradient(50% 40% at 100% 100%, rgba(110,35,56,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- layout scaffolding ---------- */
+
+.stage-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+}
+
+.stage {
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(9vh, 48px) 24px calc(env(safe-area-inset-bottom, 0px) + 64px);
+  padding-top: max(9vh, 48px);
+}
+
+.stage[hidden] { display: none; }
+
+.stage-inner {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+}
+
+.stage-inner--center {
+  justify-content: center;
+  min-height: calc(100svh - max(9vh, 48px) - 64px);
+}
+
+/* stage transition state, driven by JS */
+.stage {
+  opacity: 1;
+}
+.stage.is-leaving {
+  animation: stageLeave 480ms var(--ease) both;
+}
+.stage.is-entering {
+  animation: stageEnter 620ms var(--ease) both;
+}
+
+@keyframes stageLeave {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes stageEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- fade-in choreography for lines within a stage ---------- */
+
+.fade-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: itemIn 760ms var(--ease) forwards;
+  animation-delay: calc(var(--d, 0) * 180ms + 120ms);
+}
+
+@keyframes itemIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- typography ---------- */
+
+.line-heading {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 6.4vw, 2.6rem);
+  line-height: 1.28;
+  color: var(--wine-deep);
+  margin: 0;
+  max-width: 18ch;
+}
+
+.line-heading--sm {
+  font-size: clamp(1.5rem, 5.2vw, 2.05rem);
+}
+
+.line-sub {
+  font-family: var(--font-ui);
+  font-weight: 300;
+  font-size: clamp(1rem, 3.6vw, 1.12rem);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.line-sub--tight {
+  margin-top: 6px;
+}
+
+.line-sign {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.15rem, 4vw, 1.35rem);
+  color: var(--wine);
+  line-height: 1.6;
+  margin-top: 6px;
+}
+
+.heart {
+  display: inline-block;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 220ms var(--ease), box-shadow 220ms var(--ease), background 220ms var(--ease), opacity 220ms var(--ease);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--wine);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background: var(--wine);
+  color: var(--paper);
+  padding: 15px 40px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 24px var(--shadow);
+  min-height: 48px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px var(--shadow);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-link {
+  background: none;
+  color: var(--wine);
+  font-size: 0.98rem;
+  font-weight: 400;
+  padding: 12px 8px;
+  min-height: 44px;
+  border-bottom: 1px solid transparent;
+}
+
+.btn-link:hover {
+  border-bottom-color: var(--wine);
+}
+
+/* ---------- audio player ---------- */
+
+.player {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 12px 32px var(--shadow);
+}
+
+.player-toggle {
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--wine);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.player-toggle:focus-visible {
+  outline: 2px solid var(--wine);
+  outline-offset: 3px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.player-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.player-bar {
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.player-bar-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--dusty-rose);
+  opacity: 0.35;
+}
+
+.player-bar-fill {
+  position: absolute;
+  left: 0;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--wine);
+  width: 0%;
+}
+
+.player-bar-knob {
+  position: absolute;
+  left: 0%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--wine);
+  box-shadow: 0 0 0 4px rgba(110,35,56,0.12);
+  transform: translateX(-50%);
+}
+
+.player-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- video ---------- */
+
+.video-frame {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px var(--shadow);
+  background: #000;
+  line-height: 0;
+}
+
+.video-frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 72svh;
+}
+
+/* ---------- letter ---------- */
+
+.letter {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 18px 44px var(--shadow);
+  padding: clamp(28px, 7vw, 52px) clamp(22px, 6vw, 46px);
+  text-align: left;
+}
+
+.letter p {
+  font-family: var(--font-display);
+  font-size: clamp(1.08rem, 3.6vw, 1.22rem);
+  line-height: 1.75;
+  color: var(--ink);
+  margin: 0 0 1.15em 0;
+}
+
+.letter p:last-of-type {
+  margin-bottom: 0;
+}
+
+.letter-close {
+  margin-top: 2.4em;
+  padding-top: 1.8em;
+  border-top: 1px solid var(--dusty-rose);
+  border-top-color: rgba(206, 125, 132, 0.4);
+  text-align: center;
+}
+
+.letter-close__wish {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 4vw, 1.4rem);
+  font-weight: 500;
+  color: var(--wine-deep);
+  line-height: 1.6;
+  margin: 0 0 0.9em 0;
+}
+
+.letter-close__date {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  margin: 0 0 1.6em 0;
+}
+
+.letter-close__sign {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.2rem, 4vw, 1.45rem);
+  color: var(--wine);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.letter-continue {
+  margin-top: 6px;
+}
+
+/* ---------- misc ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .stage {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
