@@ -1,7 +1,10 @@
 (function () {
   "use strict";
 
-  var STAGE_ORDER = ["stage-entrada", "stage-audio", "stage-video", "stage-carta", "stage-final"];
+  var STAGE_ORDER = [
+    "stage-entrada", "stage-audio", "stage-video", "stage-carta", "stage-final",
+    "stage-reacao-video", "stage-reacao-mensagens", "stage-reacao-audios", "stage-reacao-memorias"
+  ];
   var stages = {};
   STAGE_ORDER.forEach(function (id) {
     stages[id] = document.getElementById(id);
@@ -18,12 +21,22 @@
     var to = stages[toId];
     if (!to) return;
 
-    // pause any playing media on the stage we're leaving
-    if (fromId === "stage-audio" && audioEl && !audioEl.paused) {
-      audioEl.pause();
+    if (fromId === "stage-audio" && window.__audioEls && window.__audioEls.audioEl && !window.__audioEls.audioEl.paused) {
+      window.__audioEls.audioEl.pause();
     }
-    if (fromId === "stage-video" && videoEl && !videoEl.paused) {
-      videoEl.pause();
+    if (fromId === "stage-video") {
+      var v = document.getElementById("videoEl");
+      if (v && !v.paused) v.pause();
+    }
+    if (fromId === "stage-reacao-video") {
+      var rv = document.getElementById("reacaoVideoEl");
+      if (rv && !rv.paused) rv.pause();
+    }
+    if (fromId === "stage-reacao-audios") {
+      ["reacaoAudio1El", "reacaoAudio2El"].forEach(function (id) {
+        var a = document.getElementById(id);
+        if (a && !a.paused) a.pause();
+      });
     }
 
     var finishEnter = function () {
@@ -62,7 +75,6 @@
     var items = container.querySelectorAll(".fade-item");
     items.forEach(function (el) {
       el.style.animation = "none";
-      // force reflow so the animation restarts
       void el.offsetWidth;
       el.style.animation = "";
     });
@@ -80,20 +92,22 @@
   document.getElementById("btnToFinal").addEventListener("click", function () {
     goToStage("stage-carta", "stage-final");
   });
+  document.getElementById("btnToReacao").addEventListener("click", function () {
+    goToStage("stage-final", "stage-reacao-video");
+  });
+  document.getElementById("btnToMensagens").addEventListener("click", function () {
+    goToStage("stage-reacao-video", "stage-reacao-mensagens");
+  });
+  document.getElementById("btnToAudios").addEventListener("click", function () {
+    goToStage("stage-reacao-mensagens", "stage-reacao-audios");
+  });
+  document.getElementById("btnToMemorias").addEventListener("click", function () {
+    goToStage("stage-reacao-audios", "stage-reacao-memorias");
+  });
 
   /* ---------------------------------------------------------
-     Custom audio player
+     Reusable custom audio player factory
      --------------------------------------------------------- */
-
-  var audioEl = document.getElementById("audioEl");
-  var audioToggle = document.getElementById("audioToggle");
-  var iconPlay = audioToggle.querySelector(".icon-play");
-  var iconPause = audioToggle.querySelector(".icon-pause");
-  var audioBar = document.getElementById("audioBar");
-  var audioFill = document.getElementById("audioFill");
-  var audioKnob = document.getElementById("audioKnob");
-  var audioCurrent = document.getElementById("audioCurrent");
-  var audioDuration = document.getElementById("audioDuration");
 
   function formatTime(sec) {
     if (!isFinite(sec) || isNaN(sec) || sec < 0) return "0:00";
@@ -102,79 +116,91 @@
     return m + ":" + (s < 10 ? "0" : "") + s;
   }
 
-  function setPlayIcon(isPlaying) {
-    iconPlay.hidden = isPlaying;
-    iconPause.hidden = !isPlaying;
-    audioToggle.setAttribute("aria-label", isPlaying ? "Pausar áudio" : "Reproduzir áudio");
+  function initAudioPlayer(ids) {
+    var audioEl = document.getElementById(ids.audio);
+    var toggle = document.getElementById(ids.toggle);
+    var bar = document.getElementById(ids.bar);
+    var fill = document.getElementById(ids.fill);
+    var knob = document.getElementById(ids.knob);
+    var current = document.getElementById(ids.current);
+    var duration = document.getElementById(ids.duration);
+    if (!audioEl) return null;
+
+    var iconPlay = toggle.querySelector(".icon-play");
+    var iconPause = toggle.querySelector(".icon-pause");
+
+    function setPlayIcon(isPlaying) {
+      iconPlay.hidden = isPlaying;
+      iconPause.hidden = !isPlaying;
+      toggle.setAttribute("aria-label", isPlaying ? "Pausar áudio" : "Reproduzir áudio");
+    }
+
+    toggle.addEventListener("click", function () {
+      if (audioEl.paused) audioEl.play(); else audioEl.pause();
+    });
+
+    audioEl.addEventListener("play", function () { setPlayIcon(true); });
+    audioEl.addEventListener("pause", function () { setPlayIcon(false); });
+    audioEl.addEventListener("ended", function () { setPlayIcon(false); });
+
+    audioEl.addEventListener("loadedmetadata", function () {
+      if (isFinite(audioEl.duration)) duration.textContent = formatTime(audioEl.duration);
+    });
+
+    audioEl.addEventListener("timeupdate", function () {
+      current.textContent = formatTime(audioEl.currentTime);
+      if (isFinite(audioEl.duration) && audioEl.duration > 0) {
+        var pct = (audioEl.currentTime / audioEl.duration) * 100;
+        fill.style.width = pct + "%";
+        knob.style.left = pct + "%";
+        bar.setAttribute("aria-valuenow", Math.round(pct));
+      }
+    });
+
+    function seekFromClientX(clientX) {
+      var rect = bar.getBoundingClientRect();
+      var ratio = (clientX - rect.left) / rect.width;
+      ratio = Math.min(1, Math.max(0, ratio));
+      if (isFinite(audioEl.duration) && audioEl.duration > 0) {
+        audioEl.currentTime = ratio * audioEl.duration;
+      }
+    }
+
+    var isDragging = false;
+    bar.addEventListener("pointerdown", function (e) {
+      isDragging = true;
+      seekFromClientX(e.clientX);
+      bar.setPointerCapture(e.pointerId);
+    });
+    bar.addEventListener("pointermove", function (e) { if (isDragging) seekFromClientX(e.clientX); });
+    bar.addEventListener("pointerup", function () { isDragging = false; });
+    bar.addEventListener("pointercancel", function () { isDragging = false; });
+
+    bar.addEventListener("keydown", function (e) {
+      if (!isFinite(audioEl.duration)) return;
+      var step = audioEl.duration * 0.05;
+      if (e.key === "ArrowRight") { audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + step); e.preventDefault(); }
+      else if (e.key === "ArrowLeft") { audioEl.currentTime = Math.max(0, audioEl.currentTime - step); e.preventDefault(); }
+    });
+
+    return audioEl;
   }
 
-  audioToggle.addEventListener("click", function () {
-    if (audioEl.paused) {
-      audioEl.play();
-    } else {
-      audioEl.pause();
-    }
-  });
+  window.__audioEls = {
+    audioEl: initAudioPlayer({
+      audio: "audioEl", toggle: "audioToggle", bar: "audioBar",
+      fill: "audioFill", knob: "audioKnob", current: "audioCurrent", duration: "audioDuration"
+    }),
+    reacaoAudio1El: initAudioPlayer({
+      audio: "reacaoAudio1El", toggle: "reacaoAudio1Toggle", bar: "reacaoAudio1Bar",
+      fill: "reacaoAudio1Fill", knob: "reacaoAudio1Knob", current: "reacaoAudio1Current", duration: "reacaoAudio1Duration"
+    }),
+    reacaoAudio2El: initAudioPlayer({
+      audio: "reacaoAudio2El", toggle: "reacaoAudio2Toggle", bar: "reacaoAudio2Bar",
+      fill: "reacaoAudio2Fill", knob: "reacaoAudio2Knob", current: "reacaoAudio2Current", duration: "reacaoAudio2Duration"
+    })
+  };
 
-  audioEl.addEventListener("play", function () { setPlayIcon(true); });
-  audioEl.addEventListener("pause", function () { setPlayIcon(false); });
-  audioEl.addEventListener("ended", function () { setPlayIcon(false); });
-
-  audioEl.addEventListener("loadedmetadata", function () {
-    if (isFinite(audioEl.duration)) {
-      audioDuration.textContent = formatTime(audioEl.duration);
-    }
-  });
-
-  audioEl.addEventListener("timeupdate", function () {
-    audioCurrent.textContent = formatTime(audioEl.currentTime);
-    if (isFinite(audioEl.duration) && audioEl.duration > 0) {
-      var pct = (audioEl.currentTime / audioEl.duration) * 100;
-      audioFill.style.width = pct + "%";
-      audioKnob.style.left = pct + "%";
-      audioBar.setAttribute("aria-valuenow", Math.round(pct));
-    }
-  });
-
-  function seekFromClientX(clientX) {
-    var rect = audioBar.getBoundingClientRect();
-    var ratio = (clientX - rect.left) / rect.width;
-    ratio = Math.min(1, Math.max(0, ratio));
-    if (isFinite(audioEl.duration) && audioEl.duration > 0) {
-      audioEl.currentTime = ratio * audioEl.duration;
-    }
-  }
-
-  var isDragging = false;
-
-  audioBar.addEventListener("pointerdown", function (e) {
-    isDragging = true;
-    seekFromClientX(e.clientX);
-    audioBar.setPointerCapture(e.pointerId);
-  });
-  audioBar.addEventListener("pointermove", function (e) {
-    if (isDragging) seekFromClientX(e.clientX);
-  });
-  audioBar.addEventListener("pointerup", function () { isDragging = false; });
-  audioBar.addEventListener("pointercancel", function () { isDragging = false; });
-
-  audioBar.addEventListener("keydown", function (e) {
-    if (!isFinite(audioEl.duration)) return;
-    var step = audioEl.duration * 0.05;
-    if (e.key === "ArrowRight") {
-      audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + step);
-      e.preventDefault();
-    } else if (e.key === "ArrowLeft") {
-      audioEl.currentTime = Math.max(0, audioEl.currentTime - step);
-      e.preventDefault();
-    }
-  });
-
-  /* ---------------------------------------------------------
-     Video
-     --------------------------------------------------------- */
-
-  var videoEl = document.getElementById("videoEl");
-  // no autoplay; native controls handle play/pause/volume/seek
+  /* videos use native controls; nothing extra required beyond data-src handling in auth.js */
 
 })();

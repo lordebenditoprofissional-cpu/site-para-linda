@@ -12,7 +12,92 @@
 </head>
 <body>
 
-<div class="stage-wrap" id="stageWrap">
+<!-- ============================================================
+     PORTÃO DE ACESSO (password gate) — aparece antes de tudo
+     ============================================================ -->
+<div id="authGate">
+
+  <!-- Primeira utilização: criar palavra-passe -->
+  <section class="gate-screen" id="gateSetup" hidden>
+    <div class="gate-card">
+      <h1 class="gate-title">Cria a tua palavra-passe</h1>
+      <p class="gate-subtitle">Só precisas de fazer isto uma vez. ❤️</p>
+
+      <label class="field-label" for="setupPw1">Nova palavra-passe</label>
+      <div class="pw-field">
+        <input class="field" id="setupPw1" type="password" autocomplete="new-password">
+        <button class="pw-eye" type="button" data-target="setupPw1" aria-label="Mostrar palavra-passe">👁</button>
+      </div>
+
+      <label class="field-label" for="setupPw2">Confirmar palavra-passe</label>
+      <div class="pw-field">
+        <input class="field" id="setupPw2" type="password" autocomplete="new-password">
+        <button class="pw-eye" type="button" data-target="setupPw2" aria-label="Mostrar palavra-passe">👁</button>
+      </div>
+
+      <button class="btn btn-primary" id="btnSetupSave" type="button">Guardar</button>
+      <p class="gate-status" id="setupStatusMsg"></p>
+    </div>
+  </section>
+
+  <!-- Ecrã de bloqueio normal -->
+  <section class="gate-screen" id="gateLock" hidden>
+    <div class="gate-card">
+      <h1 class="gate-title">Este espaço é só teu. <span class="heart">❤️</span></h1>
+      <p class="gate-subtitle">Introduz a palavra-passe para entrares.</p>
+
+      <div class="pw-field">
+        <input class="field" id="lockPwInput" type="password" autocomplete="current-password" placeholder="Palavra-passe">
+        <button class="pw-eye" type="button" data-target="lockPwInput" aria-label="Mostrar palavra-passe">👁</button>
+      </div>
+
+      <button class="btn btn-primary" id="btnUnlock" type="button">Entrar</button>
+      <p class="gate-status" id="lockStatusMsg"></p>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============================================================
+     BOTÃO DE DEFINIÇÕES (só visível depois de desbloquear)
+     ============================================================ -->
+<button class="settings-fab" id="btnOpenSettings" type="button" aria-label="Definições" hidden>⚙</button>
+
+<div class="settings-overlay" id="settingsOverlay" hidden>
+  <div class="settings-panel">
+    <h2 class="settings-title">Definições</h2>
+
+    <p class="settings-label">Alterar palavra-passe</p>
+    <label class="field-label" for="curPw">Palavra-passe atual</label>
+    <input class="field" id="curPw" type="password" autocomplete="current-password">
+    <label class="field-label" for="newPw1">Nova palavra-passe</label>
+    <input class="field" id="newPw1" type="password" autocomplete="new-password">
+    <label class="field-label" for="newPw2">Confirmar nova palavra-passe</label>
+    <input class="field" id="newPw2" type="password" autocomplete="new-password">
+    <button class="btn btn-primary" id="btnChangePw" type="button">Guardar nova palavra-passe</button>
+    <p class="gate-status" id="changePwStatus"></p>
+
+    <hr class="settings-divider">
+
+    <p class="settings-label">Bloqueio automático</p>
+    <select class="field" id="autoLockSelect">
+      <option value="5">Após 5 minutos de inatividade</option>
+      <option value="15">Após 15 minutos de inatividade</option>
+      <option value="30">Após 30 minutos de inatividade</option>
+      <option value="0">Nunca bloquear automaticamente</option>
+    </select>
+
+    <hr class="settings-divider">
+
+    <button class="btn btn-secondary" id="btnLockNow" type="button">Bloquear agora</button>
+    <button class="btn btn-link" id="btnCloseSettings" type="button">Fechar</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     CONTEÚDO DO SITE — escondido até o desbloqueio
+     ============================================================ -->
+<div class="stage-wrap" id="siteContent" hidden>
 
   <!-- TELA 1 — ENTRADA -->
   <section class="stage" id="stage-entrada" data-stage="1">
@@ -29,7 +114,7 @@
       <p class="fade-item line-heading line-heading--sm" style="--d:0">Antes de continuares... ouve isto. <span class="heart">😌</span></p>
 
       <div class="player fade-item" style="--d:1">
-        <audio id="audioEl" preload="metadata" src="assets/audio/linda-audio.mp3"></audio>
+        <audio id="audioEl" preload="metadata" data-src="assets/audio/linda-audio.mp3"></audio>
 
         <button class="player-toggle" id="audioToggle" type="button" aria-label="Reproduzir áudio">
           <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -64,10 +149,10 @@
       <p class="fade-item line-sub" style="--d:1">Espero que assistas até ao fim.</p>
 
       <div class="video-frame fade-item" style="--d:2">
-        <video id="videoEl" controls playsinline preload="metadata" src="assets/video/linda-video.mp4"></video>
+        <video id="videoEl" controls playsinline preload="metadata" data-src="assets/video/linda-video.mp4"></video>
       </div>
 
-      <p class="fade-item line-sub line-sub--tight" style="--d:3" id="videoFollowup">Tenho mais uma coisa para te dizer... <span class="heart">❤️</span></p>
+      <p class="fade-item line-sub line-sub--tight" style="--d:3">Tenho mais uma coisa para te dizer... <span class="heart">❤️</span></p>
       <button class="btn btn-primary fade-item" style="--d:4" id="btnToCarta" type="button">Continuar</button>
     </div>
   </section>
@@ -187,17 +272,105 @@
     </div>
   </section>
 
-  <!-- TELA 5 — FINAL -->
+  <!-- TELA 5 — FINAL (original, preservado) -->
   <section class="stage" id="stage-final" data-stage="5" hidden>
     <div class="stage-inner stage-inner--center">
       <p class="fade-item line-heading line-heading--sm" style="--d:0">Espero que tenhas gostado. <span class="heart">❤️</span></p>
       <p class="fade-item line-sub" style="--d:1">Este pequeno espaço foi feito só para ti.</p>
+      <p class="fade-item line-sign" style="--d:2">Com carinho,<br>Lorde <span class="heart">❤️</span></p>
+      <button class="btn btn-link fade-item" style="--d:3" id="btnToReacao" type="button">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- TELA 6 — REAÇÃO: VÍDEO -->
+  <section class="stage" id="stage-reacao-video" data-stage="6" hidden>
+    <div class="stage-inner">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">E depois... aconteceu isto. <span class="heart">❤️</span></p>
+      <p class="fade-item line-sub" style="--d:1">A tua reação, guardada para sempre.</p>
+
+      <div class="video-frame fade-item" style="--d:2">
+        <video id="reacaoVideoEl" controls playsinline preload="metadata" data-src="assets/video/reacao-linda.mp4"></video>
+      </div>
+
+      <button class="btn btn-primary fade-item" style="--d:3" id="btnToMensagens" type="button">Continuar</button>
+    </div>
+  </section>
+
+  <!-- TELA 7 — REAÇÃO: MENSAGENS -->
+  <section class="stage" id="stage-reacao-mensagens" data-stage="7" hidden>
+    <div class="stage-inner">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">O que me escreveste a seguir. <span class="heart">❤️</span></p>
+
+      <div class="msg-card fade-item" style="--d:1">
+        <img class="msg-img" data-src="assets/images/mensagem-1.png" alt="Mensagem da Linda" loading="lazy">
+      </div>
+      <div class="msg-card fade-item" style="--d:2">
+        <img class="msg-img" data-src="assets/images/mensagem-2.png" alt="Mensagem da Linda" loading="lazy">
+      </div>
+
+      <button class="btn btn-primary fade-item" style="--d:3" id="btnToAudios" type="button">Continuar</button>
+    </div>
+  </section>
+
+  <!-- TELA 8 — REAÇÃO: ÁUDIOS -->
+  <section class="stage" id="stage-reacao-audios" data-stage="8" hidden>
+    <div class="stage-inner">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">A tua voz. <span class="heart">❤️</span></p>
+
+      <p class="player-label fade-item" style="--d:1">Áudio 01 ❤️</p>
+      <div class="player fade-item" style="--d:1">
+        <audio id="reacaoAudio1El" preload="metadata" data-src="assets/audio/reacao-audio-1.mp3"></audio>
+        <button class="player-toggle" id="reacaoAudio1Toggle" type="button" aria-label="Reproduzir áudio">
+          <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l11-6.5-11-6.5z"></path></svg>
+          <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false" hidden><path d="M7 5h4v14H7zM13 5h4v14h-4z"></path></svg>
+        </button>
+        <div class="player-body">
+          <div class="player-bar" id="reacaoAudio1Bar" role="slider" aria-label="Progresso do áudio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="player-bar-track"></div>
+            <div class="player-bar-fill" id="reacaoAudio1Fill"></div>
+            <div class="player-bar-knob" id="reacaoAudio1Knob"></div>
+          </div>
+          <div class="player-time"><span id="reacaoAudio1Current">0:00</span><span id="reacaoAudio1Duration">&nbsp;</span></div>
+        </div>
+      </div>
+
+      <p class="player-label fade-item" style="--d:2">Áudio 02 ❤️</p>
+      <div class="player fade-item" style="--d:2">
+        <audio id="reacaoAudio2El" preload="metadata" data-src="assets/audio/reacao-audio-2.mp3"></audio>
+        <button class="player-toggle" id="reacaoAudio2Toggle" type="button" aria-label="Reproduzir áudio">
+          <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l11-6.5-11-6.5z"></path></svg>
+          <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false" hidden><path d="M7 5h4v14H7zM13 5h4v14h-4z"></path></svg>
+        </button>
+        <div class="player-body">
+          <div class="player-bar" id="reacaoAudio2Bar" role="slider" aria-label="Progresso do áudio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="player-bar-track"></div>
+            <div class="player-bar-fill" id="reacaoAudio2Fill"></div>
+            <div class="player-bar-knob" id="reacaoAudio2Knob"></div>
+          </div>
+          <div class="player-time"><span id="reacaoAudio2Current">0:00</span><span id="reacaoAudio2Duration">&nbsp;</span></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary fade-item" style="--d:3" id="btnToMemorias" type="button">Continuar</button>
+    </div>
+  </section>
+
+  <!-- TELA 9 — REAÇÃO: MEMÓRIAS -->
+  <section class="stage" id="stage-reacao-memorias" data-stage="9" hidden>
+    <div class="stage-inner stage-inner--center">
+      <p class="fade-item line-heading line-heading--sm" style="--d:0">E assim, guardamos mais um momento. <span class="heart">❤️</span></p>
+
+      <div class="collage-frame fade-item" style="--d:1">
+        <img class="collage-img" data-src="assets/images/memorias.jpeg" alt="Memórias" loading="lazy">
+      </div>
+
       <p class="fade-item line-sign" style="--d:2">Com carinho,<br>Lorde <span class="heart">❤️</span></p>
     </div>
   </section>
 
 </div>
 
+<script src="js/auth.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>
